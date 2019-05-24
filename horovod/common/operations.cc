@@ -1180,10 +1180,15 @@ void BackgroundThreadLoop(HorovodGlobalState& state, MPIContext& ctx) {
     // ddl_finalize calls MPI_Finalize
     ddl_finalize();
 #else
+
+    MPI_Comm_set_errhandler(MPI_COMM_WORLD, MPI_ERRORS_RETURN);
+    
     int is_mpi_finalized = 0;
     MPI_Finalized(&is_mpi_finalized);
     if (!is_mpi_finalized) {
-      MPI_Finalize();
+        int ierr;
+        ierr = MPI_Finalize();
+        LOG(INFO, rank) << "MaxG MPI_Finalize returned " << ierr;
     }
 #endif
   }
