@@ -1103,12 +1103,16 @@ void BackgroundThreadLoop(HorovodGlobalState& state, MPIContext& ctx) {
 
   LOG(DEBUG, rank) << "Shutting down background thread";
 
+  LOG(INFO, rank) << "MaxG Shutdown A";
+
   // Signal that shutdown has been requested.
   state.shut_down = true;
 
 #if HAVE_NCCL
   nccl_context.ShutDown();
 #endif
+
+  LOG(INFO, rank) << "MaxG Shutdown B";
 
   // Notify all outstanding operations that Horovod has been shut down
   // and clear up the tensor table and message queue.
@@ -1127,34 +1131,50 @@ void BackgroundThreadLoop(HorovodGlobalState& state, MPIContext& ctx) {
     cb(SHUT_DOWN_ERROR);
   }
 
+  LOG(INFO, rank) << "MaxG Shutdown C";
+
   if (horovod_global.shared_buffer != nullptr) {
     MPI_Win_free(&ctx.window);
     horovod_global.shared_buffer = nullptr;
   }
+
+  LOG(INFO, rank) << "MaxG Shutdown D";
 
   if (ctx.mpi_comm != MPI_COMM_NULL &&
       ctx.mpi_comm != MPI_COMM_WORLD) {
     MPI_Comm_free(&ctx.mpi_comm);
   }
 
+  LOG(INFO, rank) << "MaxG Shutdown E";
+
   if (ctx.local_comm != MPI_COMM_NULL) {
     MPI_Comm_free(&ctx.local_comm);
   }
+
+  LOG(INFO, rank) << "MaxG Shutdown F";
 
   if (ctx.cross_comm != MPI_COMM_NULL) {
     MPI_Comm_free(&ctx.cross_comm);
   }
 
+  LOG(INFO, rank) << "MaxG Shutdown G";
+
   if (ctx.mpi_float16_t != MPI_DATATYPE_NULL) {
     MPI_Type_free(&ctx.mpi_float16_t);
   }
+
+  LOG(INFO, rank) << "MaxG Shutdown H";
 
   if (ctx.mpi_float16_sum != MPI_OP_NULL) {
     MPI_Op_free(&ctx.mpi_float16_sum);
   }
 
+  LOG(INFO, rank) << "MaxG Shutdown I";
+
   horovod_global.param_manager.FreeMpiTypes();
 
+  LOG(INFO, rank) << "MaxG Shutdown J";
+  
   if (horovod_global.should_finalize) {
 #if HAVE_DDL
     // ddl_finalize calls MPI_Finalize
@@ -1167,6 +1187,8 @@ void BackgroundThreadLoop(HorovodGlobalState& state, MPIContext& ctx) {
     }
 #endif
   }
+
+  LOG(INFO, rank) << "MaxG Shutdown K";
 }
 
 // If all messages in queue have responses in cache, use fast path with
