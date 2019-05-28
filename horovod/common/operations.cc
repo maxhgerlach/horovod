@@ -1181,7 +1181,8 @@ void BackgroundThreadLoop(HorovodGlobalState& state, MPIContext& ctx) {
     ddl_finalize();
 #else
 
-    MPI_Comm_set_errhandler(MPI_COMM_WORLD, MPI_ERRORS_RETURN);
+    // MPI_Comm_set_errhandler(MPI_COMM_WORLD, MPI_ERRORS_RETURN);
+    LOG(INFO, rank) << " ~~ using default MPI errhandler";
     
     int is_mpi_finalized = 0;
 
