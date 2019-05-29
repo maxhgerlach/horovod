@@ -1133,6 +1133,18 @@ void BackgroundThreadLoop(HorovodGlobalState& state, MPIContext& ctx) {
 
   LOG(INFO, rank) << "MaxG Shutdown C";
 
+  if (ctx.mpi_comm != MPI_COMM_NULL) {
+      LOG(INFO, rank) << "MaxG start MPI_Comm_disconnect";
+      MPI_Comm_disconnect(&ctx.mpi_comm);
+      LOG(INFO, rank) << "MaxG MPI_Comm_disconnect concluded";
+
+      LOG(INFO, rank) << "MaxG start MPI_Comm_free";
+      MPI_Comm_free(&ctx.mpi_comm);
+      LOG(INFO, rank) << "MaxG MPI_Comm_free concluded";
+  }
+
+  LOG(INFO, rank) << "MaxG Shutdown C.a";
+
   if (horovod_global.shared_buffer != nullptr) {
     MPI_Win_free(&ctx.window);
     horovod_global.shared_buffer = nullptr;
@@ -1179,17 +1191,7 @@ void BackgroundThreadLoop(HorovodGlobalState& state, MPIContext& ctx) {
 #if HAVE_DDL
     // ddl_finalize calls MPI_Finalize
     ddl_finalize();
-#else
-
-    if (ctx.mpi_comm != MPI_COMM_NULL) {
-        LOG(INFO, rank) << "MaxG start MPI_Comm_disconnect";
-        MPI_Comm_disconnect(&ctx.mpi_comm);
-        LOG(INFO, rank) << "MaxG MPI_Comm_disconnect concluded";
-
-        LOG(INFO, rank) << "MaxG start MPI_Comm_free";
-        MPI_Comm_free(&ctx.mpi_comm);
-        LOG(INFO, rank) << "MaxG MPI_Comm_free concluded";
-    }
+#else    
 
     // MPI_Comm_set_errhandler(MPI_COMM_WORLD, MPI_ERRORS_RETURN);
     LOG(INFO, rank) << " ~~ using default MPI errhandler";
