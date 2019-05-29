@@ -1181,6 +1181,10 @@ void BackgroundThreadLoop(HorovodGlobalState& state, MPIContext& ctx) {
     ddl_finalize();
 #else
 
+    LOG(INFO, rank) << "MaxG start MPI_Comm_discconect";
+    MPI_Comm_disconnect(&ctx.mpi_comm);
+    LOG(INFO, rank) << "MaxG MPI_Comm_discconect concluded";
+
     // MPI_Comm_set_errhandler(MPI_COMM_WORLD, MPI_ERRORS_RETURN);
     LOG(INFO, rank) << " ~~ using default MPI errhandler";
     
